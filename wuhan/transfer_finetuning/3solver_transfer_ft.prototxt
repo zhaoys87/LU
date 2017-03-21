@@ -1,0 +1,36 @@
+net: "wuhan/transfer_finetuning/3train_val_transfer_ft.prototxt"
+
+# Carry out testing every 500 training iterations.
+test_interval: 100
+
+# Display every 100 iterations
+display: 100
+
+# learning parameters
+base_lr: 0.001
+lr_policy: "poly"
+gamma: 0.1
+power: 0.5
+max_iter: 10000
+momentum: 0.9
+weight_decay: 0.0005
+
+# snapshot intermediate results
+snapshot: 10000
+snapshot_prefix: "wuhan/transfer_finetuning/caffe_alexnet_ft_3train"
+
+solver_mode: GPU
+# type: SGD
+
+# The train set has 48 images, so we run 8 test iters (8 * 6 = 48).
+test_iter: 8
+test_state: { stage: "test-on-test-set" }
+
+# trace parameters
+train_trace_interval: 100
+human_readable_trace: true
+snapshot_trace: 100
+# test_compute_loss: false
+# weight_trace_interval = 0 means not output the trace of weight
+num_weight_traces: 10
+weight_trace_interval: 0

@@ -1,0 +1,177 @@
+name: "cnn_social_data_train_val"
+layer {
+  name: "data"
+  type: "RSImageData"
+  top: "data"
+  top: "label"
+  include {
+    phase: TRAIN
+  }
+  transform_param {
+    mean_file: "social-model-hk/social-data-mean.binaryproto"
+  }
+  rsimage_data_param {
+    source: "social-model-hk/social_soc_tr_samples.txt"
+    batch_size: 50
+  }
+}
+
+layer {
+  name: "data"
+  type: "RSImageData"
+  top: "data"
+  top: "label"
+  include {
+    phase: TEST
+  }
+  transform_param {
+    mean_file: "social-model-hk/social-data-mean.binaryproto"
+  }
+  rsimage_data_param {
+    source: "social-model-hk/social_soc_te_samples.txt"
+    batch_size: 5
+  }
+}
+
+layer {
+  name: "norm1-so"
+  type: "LRN"
+  bottom: "data"
+  top: "data-so-n"
+  lrn_param {
+    local_size: 5
+    alpha: 1
+    beta: 0.75
+  }
+}
+
+layer {
+  name: "fc1-so"
+  type: "InnerProduct"
+  bottom: "data-so-n"
+  top: "fc1-so"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 160
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu1-so"
+  type: "ReLU"
+  bottom: "fc1-so"
+  top: "fc1-so"
+}
+
+
+layer {
+  name: "drop1"
+  type: "Dropout"
+  bottom: "fc1-so"
+  top: "fc1-so"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+
+
+layer {
+  name: "fc2-so"
+  type: "InnerProduct"
+  bottom: "fc1-so"
+  top: "fc2-so"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 32
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu2-so"
+  type: "ReLU"
+  bottom: "fc2-so"
+  top: "fc2-so"
+}
+
+layer {
+  name: "drop2"
+  type: "Dropout"
+  bottom: "fc2-so"
+  top: "fc2-so"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+
+layer {
+  name: "fc3-so"
+  type: "InnerProduct"
+  bottom: "fc2-so"
+  top: "fc3-so"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 12
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "loss"
+  type: "SoftmaxWithLoss"
+  bottom: "fc3-so"
+  bottom: "label"
+  top: "loss"
+}
+
+layer {
+  name: "accuracy"
+  type: "Accuracy"
+  bottom: "fc3-so"
+  bottom: "label"
+  top: "accuracy"
+}
+

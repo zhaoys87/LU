@@ -1,0 +1,36 @@
+net: "social-shenzhen/transfer_ft/fe_train_val_alexnet_classifier.prototxt"
+
+# Carry out testing every 500 training iterations.
+test_interval: 100
+
+# Display every 100 iterations
+display: 100
+
+# learning parameters
+base_lr: 0.01
+lr_policy: "poly"
+gamma: 0.1
+power: 0.5
+max_iter: 10000
+momentum: 0.9
+weight_decay: 0.0005
+
+# snapshot intermediate results
+snapshot: 10000
+snapshot_prefix: "social-shenzhen/transfer_ft/results/fe_alexnet_classifier"
+
+solver_mode: GPU
+# type: SGD
+
+# The test set has 180 images, so we run 36 test iters (36 * 5 = 180).
+test_iter: 36
+test_state: { stage: "test-on-test-set" }
+
+# trace parameters
+train_trace_interval: 100
+human_readable_trace: true
+snapshot_trace: 100
+# test_compute_loss: false
+# weight_trace_interval = 0 means not output the trace of weight
+num_weight_traces: 10
+weight_trace_interval: 0

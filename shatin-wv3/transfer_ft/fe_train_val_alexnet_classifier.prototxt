@@ -1,0 +1,162 @@
+name: "AlexNet_Transfer_Fixed"
+layer {
+  name: "data"
+  type: "MemoryData"
+  top: "data"
+  top: "label"
+  include {
+    phase: TRAIN
+  }
+  memory_data_param {
+    batch_size: 66
+    channels: 4096
+    height: 1
+    width: 1
+  }
+}
+
+layer {
+  name: "data"
+  type: "MemoryData"
+  top: "data"
+  top: "label"
+  include: {
+      phase: TEST
+      stage: "test-on-test-set"
+  }
+  memory_data_param {
+    batch_size: 5
+    channels: 4096
+    height: 1
+    width: 1
+  }
+}
+
+layer {
+  name: "fc7-ft"
+  type: "InnerProduct"
+  bottom: "data"
+  top: "fc7-ft"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 512
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu7-ft"
+  type: "ReLU"
+  bottom: "fc7-ft"
+  top: "fc7-ft"
+}
+
+layer {
+  name: "drop7-ft"
+  type: "Dropout"
+  bottom: "fc7-ft"
+  top: "fc7-ft"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+
+layer {
+  name: "fc8-ft"
+  type: "InnerProduct"
+  bottom: "fc7-ft"
+  top: "fc8-ft"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 256
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "relu8-ft"
+  type: "ReLU"
+  bottom: "fc8-ft"
+  top: "fc8-ft"
+}
+
+layer {
+  name: "drop8-ft"
+  type: "Dropout"
+  bottom: "fc8-ft"
+  top: "fc8-ft"
+  dropout_param {
+    dropout_ratio: 0.5
+  }
+}
+
+layer {
+  name: "fc9-ft"
+  type: "InnerProduct"
+  bottom: "fc8-ft"
+  top: "fc9-ft"
+  param {
+    lr_mult: 1
+    decay_mult: 1
+  }
+  param {
+    lr_mult: 2
+    decay_mult: 0
+  }
+  inner_product_param {
+    num_output: 11
+    weight_filler {
+      type: "gaussian"
+      std: 0.01
+    }
+    bias_filler {
+      type: "constant"
+      value: 0
+    }
+  }
+}
+
+layer {
+  name: "loss"
+  type: "SoftmaxWithLoss"
+  bottom: "fc9-ft"
+  bottom: "label"
+  top: "loss"
+}
+
+layer {
+  name: "accuracy"
+  type: "Accuracy"
+  bottom: "fc9-ft"
+  bottom: "label"
+  top: "accuracy"
+}
+
