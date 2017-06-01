@@ -153,6 +153,7 @@ social_data = log(socdat.social_data + 1);
 social_max = max(social_data(:));
 social_min =  min(social_data(:));
 social_data = uint8((social_data - social_min)*(255 / (social_max-social_min))); 
+% should be revised by the ((x - mean) * 128 / std * 2 + 128)
 dim_vec = size(social_data, 2);
 
 if(outputtxtfile),

@@ -8,7 +8,7 @@ crop_shape = [227, 227];
 type = 12; % 9: (image_alex_fe + social_cnn) + small_nets; 10: image_alex_fe + (small_nets + social_cnn);
           % 12: (image_alex_fe + social_cnn) + (small_nets + social_cnn)
 Sample_Type = 2; % type of sampling. 1 : unified sampling; 2 : street block sampling;
-dataset = 1; % 1: hk-wv3-kawloon; 2: Shatin
+dataset = 1; % 1: hk-wv3-kawloon; 2: hk-kawloon and Shatin
 iternum = 10000;
 class_num = 12;
 read_large_flag = 1;  % 0: false; 1: true;
@@ -83,6 +83,7 @@ social_max = max(social_data(:));
 social_min =  min(social_data(:));
 social_dim_vec = size(social_data, 2);
 social_data = uint8((social_data' - social_min)*(255 / (social_max-social_min))); 
+% should be revised. by sigma * 2 like image data.
 
 meansocload = load(mean_social_file);
 mean_social_data = meansocload.mean_data;

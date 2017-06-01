@@ -1,5 +1,5 @@
 clc; 
-%% urban_anno_dcnn_hkwv3
+%% urban_anno_dcnn_sz
 % Demonstration for land-use annotation
 %% bei zhao, zhaoys@cuhk.edu.hk, Nov. 11, 2016
 %% input data
@@ -7,7 +7,6 @@ clc;
 crop_shape = [227, 227];
 type = 4; % 12: (image_alex_fe + social_cnn) + (small_nets + social_cnn)
 Sample_Type = 1; % type of sampling. 1 : unified sampling; 2 : street block sampling;
-dataset = 1; % 1: hk-wv3-kawloon; 2: Shatin
 iternum = 10000;
 class_num = 11;
 read_large_flag = 1;  % 0: false; 1: true;
@@ -36,7 +35,7 @@ block_image_path = '../Scene_HSRI/SZ-WorldView3/SZ_street_block';
 large_image_path = '../Scene_HSRI/SZ-WorldView3/SZ_WV3';
 mask_path = '../Scene_HSRI/SZ-WorldView3/SZ_WV3_mask';
 if(Sample_Type == 1)
-    ust_samp_path = '../Scene_HSRI/SZ-WorldView3/sz_samp_uni_ids';
+    ust_samp_path = '../Scene_HSRI/SZ-WorldView3/sz_samp_uni_ids_mat.mat';
 else
     ust_samp_path = '../Scene_HSRI/SZ-WorldView3/sz_samp_block_ids_mat.mat';
 end
@@ -74,6 +73,8 @@ social_max = max(social_data(:));
 social_min =  min(social_data(:));
 social_dim_vec = size(social_data, 2);
 social_data = uint8((social_data' - social_min)*(255 / (social_max-social_min))); 
+% should be revised. by sigma * 2 like image data.
+
 
 meansocload = load(mean_social_file);
 mean_social_data = meansocload.mean_data;
@@ -82,17 +83,11 @@ tic;
 [block_image, dim] = freadenvi( block_image_path );
 block_image = reshape(uint16(block_image), dim);
 
-if(Sample_Type == 1)
-    [samp_ids, dim] = freadenvi( ust_samp_path );
-    samp_ids = reshape(uint16(samp_ids), dim);
-    [sidxs, sidys] = find( samp_ids == Marker_Value );
-    block_ids = block_image(sidxs + sidys*dim(1));
-else
-    data = load(ust_samp_path);
-    sidxs = data.samp_ids(:,1);
-    sidys = data.samp_ids(:,2);
-    block_ids = data.samp_ids(:,3);
-end
+data = load(ust_samp_path);
+sidxs = data.samp_ids(:,1);
+sidys = data.samp_ids(:,2);
+block_ids = data.samp_ids(:,3);
+
 num_ids = numel(sidxs);
 sidxs_min = sidxs - semiSSize;
 sidys_min = sidys - semiSSize;
@@ -250,7 +245,9 @@ if(Sample_Type == 2),
     total_time = toc;
     fprintf('The total cost time (s) : %.1f\n', total_time);
     enviwrite(rev_labels, dim(1), dim(2), 1, [output_image '_rev']);
-    enviwrite(rev_pro, dim(1), dim(2), class_num, [output_image '_pro_rev']);
+    if(Sample_Type == 2)
+        enviwrite(rev_pro, dim(1), dim(2), class_num, [output_image '_pro_rev']);
+    end
 end
 
 rmpath('caffe-master/matlab');

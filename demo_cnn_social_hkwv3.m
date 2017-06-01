@@ -217,9 +217,9 @@ for randi = 1 : rand_num,
         if(type == 10 || type == 12)
             solver.net.copy_from(weights_img_so_file);
         end
-%         if(type == 7 || type == 8)
-%             solver.net.copy_from(weights_so_file);
-%         end
+        if(type == 7 || type == 8)
+            solver.net.copy_from(weights_so_file);
+        end
         rec_loss2(:) = 0; % training loss and test loss
         for ir = 1 : record_num(1),
             solver.step(test_interval);
